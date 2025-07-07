@@ -1,0 +1,445 @@
+/* Button Base Styles */
+button {
+    font-family: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Start Button */
+.start-btn {
+    background: linear-gradient(135deg, #ff6b9d, #ff8cc8, #ffb3d9);
+    color: white;
+    border: none;
+    padding: 18px 40px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+    margin: 30px auto;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.start-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.start-btn:hover::before {
+    left: 100%;
+}
+
+.start-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 50px rgba(255, 107, 157, 0.7);
+    animation: buttonPulse 0.6s ease-in-out;
+}
+
+.start-btn:active {
+    transform: translateY(-3px) scale(1.02);
+}
+
+.start-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+}
+
+.start-btn:disabled:hover {
+    transform: none;
+    animation: none;
+}
+
+@keyframes buttonPulse {
+    0%, 100% { transform: translateY(-5px) scale(1.05); }
+    50% { transform: translateY(-5px) scale(1.1); }
+}
+
+/* Navigation Buttons */
+.nav-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 12px 20px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 100px;
+}
+
+.nav-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    border-color: rgba(255, 107, 157, 0.6);
+    box-shadow: 0 10px 25px rgba(255, 107, 157, 0.3);
+    background: rgba(255, 107, 157, 0.2);
+}
+
+.nav-btn:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-btn:disabled:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Home Button */
+.nav-btn.home {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: rgba(102, 126, 234, 0.5);
+    font-size: 1.2rem;
+    padding: 10px;
+    min-width: auto;
+    border-radius: 50%;
+    aspect-ratio: 1;
+}
+
+.nav-btn.home:hover {
+    border-color: rgba(102, 126, 234, 0.8);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+/* Level Select Button */
+.nav-btn.level-select {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #333;
+    border-color: rgba(255, 215, 0, 0.5);
+    font-weight: 700;
+}
+
+.nav-btn.level-select:hover {
+    border-color: rgba(255, 215, 0, 0.8);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+    background: linear-gradient(135deg, #ffed4e, #ffd700);
+}
+
+/* Password Button */
+.password-btn {
+    background: linear-gradient(135deg, #ff6b9d, #ff8cc8);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+}
+
+.password-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(255, 107, 157, 0.6);
+    background: linear-gradient(135deg, #ff8cc8, #ffb3d9);
+}
+
+.password-btn:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+/* Back Button */
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 12px 25px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Special Button Effects */
+.btn-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Button Groups */
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.button-group .nav-btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b9d, #ff8cc8);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fab:hover {
+    transform: scale(1.1) translateY(-3px);
+    box-shadow: 0 15px 35px rgba(255, 107, 157, 0.6);
+    animation: fabPulse 1s ease-in-out infinite;
+}
+
+@keyframes fabPulse {
+    0%, 100% { transform: scale(1.1) translateY(-3px); }
+    50% { transform: scale(1.15) translateY(-5px); }
+}
+
+/* Button States */
+.btn-loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    border-color: rgba(40, 167, 69, 0.5) !important;
+}
+
+.btn-success:hover {
+    box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4) !important;
+}
+
+.btn-error {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    border-color: rgba(220, 53, 69, 0.5) !important;
+    animation: shake 0.5s ease-in-out;
+}
+
+.btn-error:hover {
+    box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4) !important;
+}
+
+/* Touch Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn,
+    .start-btn,
+    .password-btn,
+    .back-btn {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    .fab {
+        width: 56px;
+        height: 56px;
+        bottom: 16px;
+        right: 16px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .start-btn {
+        padding: 15px 35px;
+        font-size: 1rem;
+    }
+    
+    .nav-btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        min-width: 80px;
+    }
+    
+    .password-btn {
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+    
+    .button-group {
+        gap: 8px;
+    }
+    
+    .button-group .nav-btn {
+        min-width: 100px;
+    }
+    
+    /* リアクションボタンのレスポンシブ対応を維持 */
+    .reaction-buttons {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .start-btn {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+    
+    .nav-btn {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        min-width: 70px;
+    }
+    
+    .password-btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+    
+    .button-group {
+        gap: 6px;
+    }
+    
+    .button-group .nav-btn {
+        min-width: 85px;
+        flex: 1;
+    }
+    
+    .fab {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        bottom: 12px;
+        right: 12px;
+    }
+    
+    /* リアクションボタンのレスポンシブ対応を維持 */
+    .reaction-buttons {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+    }
+    
+    .reaction-btn {
+        padding: 8px 12px !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .nav-btn,
+    .start-btn,
+    .password-btn,
+    .back-btn {
+        border-width: 3px;
+    }
+    
+    .nav-btn:hover,
+    .start-btn:hover,
+    .password-btn:hover,
+    .back-btn:hover {
+        border-width: 3px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .nav-btn,
+    .start-btn,
+    .password-btn,
+    .back-btn,
+    .fab {
+        transition: none;
+        animation: none;
+    }
+    
+    .nav-btn:hover,
+    .start-btn:hover,
+    .password-btn:hover,
+    .back-btn:hover,
+    .fab:hover {
+        transform: none;
+        animation: none;
+    }
+}

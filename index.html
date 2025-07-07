@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>HeartConnect Ultimate - 恋愛系質問カードアプリ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/background.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/effects.css">
+    <link rel="stylesheet" href="css/firstdate.css">
+</head>
+<body>
+    <!-- Background -->
+    <div class="background-container">
+        <div class="background-image"></div>
+        <div class="background-overlay"></div>
+    </div>
+
+    <!-- Enhanced Touch Effect System -->
+    <canvas id="touchEffectCanvas" class="touch-effect-canvas"></canvas>
+    <div class="particle-system" id="particleSystem"></div>
+    <div class="heart-burst-container" id="heartBurstContainer"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <div class="start-content">
+                <div class="app-logo">
+                    <h1 class="app-title">HeartConnect</h1>
+                    <p class="app-subtitle">Ultimate</p>
+                </div>
+                <p class="app-description">
+                    革新的な自己開示プログラムで<br>
+                    真の信頼関係を科学的に構築する
+                </p>
+                
+                <div class="mode-selection">
+                    <button class="mode-btn normal-mode" onclick="startDirectMode('normal')">
+                        <div class="mode-icon">💝</div>
+                        <div class="mode-text">ノーマルモード</div>
+                        <div class="mode-desc">日常的な質問で関係を深める</div>
+                    </button>
+                    
+                    <button class="mode-btn unique-mode" onclick="startDirectMode('unique')">
+                        <div class="mode-icon">✨</div>
+                        <div class="mode-text">ユニークモード</div>
+                        <div class="mode-desc">創造的な質問で新しい発見を</div>
+                    </button>
+                    
+                    <button class="mode-btn shadow-mode" onclick="startDirectMode('shadow')">
+                        <div class="mode-icon">🔥</div>
+                        <div class="mode-text">SHADOW MODE</div>
+                        <div class="mode-desc">大人向けの刺激的な質問</div>
+                    </button>
+                    
+                    <button class="mode-btn chaos-mode" onclick="startDirectMode('chaos')">
+                        <div class="mode-icon">⚡</div>
+                        <div class="mode-text">CHAOS MODE</div>
+                        <div class="mode-desc">究極の自己開示・魂の深層</div>
+                    </button>
+                    
+                    <button class="mode-btn first-date-mode" onclick="startDirectMode('firstdate')">
+                        <div class="mode-icon">💕</div>
+                        <div class="mode-text">初デートモード</div>
+                        <div class="mode-desc">AI司会で進行する新感覚デート</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password screens removed - direct access enabled -->
+
+        <!-- Level Selection Screen -->
+        <div id="levelScreen" class="screen">
+            <div class="level-content">
+                <div class="screen-header">
+                    <button class="nav-btn back" onclick="backToStart()">← 戻る</button>
+                    <h2 class="screen-title">レベル選択</h2>
+                    <div class="mode-indicator" id="modeIndicator">ノーマルモード</div>
+                </div>
+                
+                <div class="level-grid" id="levelGrid">
+                    <!-- レベルボタンがJSで動的生成される -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-content">
+                <div class="game-header">
+                    <button class="nav-btn home" onclick="backToStart()">🏠</button>
+                    <div class="progress-info">
+                        <div class="level-badge" id="currentLevel">Level 1</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-card" id="questionCard">
+                        <div class="question-number" id="questionNumber">1/10</div>
+                        <div class="question-text" id="questionText"></div>
+                        
+                        <div class="answer-examples" id="answerExamples">
+                            <!-- 回答例がJSで動的生成される -->
+                        </div>
+                        
+                        <div class="reaction-buttons" id="gameReactionButtons">
+                            <!-- オノマトペリアクションボタンがJSで動的生成される -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button class="nav-btn prev" onclick="previousQuestion()" id="prevBtn">
+                        ← 前の質問
+                    </button>
+                    <button class="nav-btn level-select" onclick="backToLevelSelect()">
+                        📋 レベル選択
+                    </button>
+                    <button class="nav-btn next" onclick="nextQuestion()" id="nextBtn">
+                        次の質問 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Screen -->
+        <div id="completionScreen" class="screen">
+            <div class="completion-content">
+                <div class="completion-header">
+                    <h2>🎉 レベル完了！ 🎉</h2>
+                    <div class="completion-stats" id="completionStats"></div>
+                </div>
+                
+                <div class="completion-buttons">
+                    <button class="completion-btn continue" onclick="continueToNextLevel()">
+                        次のレベルへ
+                    </button>
+                    <button class="completion-btn restart" onclick="restartLevel()">
+                        このレベルをもう一度
+                    </button>
+                    <button class="completion-btn home" onclick="backToStart()">
+                        ホームに戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- First Date Rules Screen -->
+        <div id="firstDateRulesScreen" class="screen firstdate-screen">
+            <div class="moderator-panel">
+                <div class="moderator-avatar">💝</div>
+                <div class="moderator-message">
+                    初デートモードへようこそ！<br>素敵な時間にするためのコツをお教えします。
+                </div>
+            </div>
+
+            <div class="firstdate-content">
+                <div class="rules-card">
+                    <h3>💫 このゲームのコツ</h3>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon">💭</div>
+                        <div class="rule-text">
+                            <strong>素直になろう</strong><br>
+                            見栄を張らずに、正直な気持ちを伝えてみて
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon">👂</div>
+                        <div class="rule-text">
+                            <strong>相手の話をよく聞こう</strong><br>
+                            批判しないで、相手の気持ちを受け止めてあげて
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon">😊</div>
+                        <div class="rule-text">
+                            <strong>楽しむことを忘れずに</strong><br>
+                            緊張も含めて、今この瞬間を大切にしよう
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-icon">📱</div>
+                        <div class="rule-text">
+                            <strong>集中しよう</strong><br>
+                            スマホは伏せて、お互いの目を見て話してみて
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-footer">
+                    <p>3つのフェーズで各6問、お互いのことを知っていきます</p>
+                    <button class="nav-btn next" onclick="startFirstDateFromRules()">
+                        はじめる 💕
+                    </button>
+                    <button class="nav-btn home" onclick="backToStart()">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- First Date Mode Screen -->
+        <div id="firstDateScreen" class="screen firstdate-screen">
+            <!-- 司会者パネル -->
+            <div class="moderator-panel" id="moderatorPanel">
+                <div class="moderator-avatar">💝</div>
+                <div class="moderator-message" id="moderatorMessage">
+                    お二人の初デートへようこそ！今日は私が司会を務めさせていただきます。
+                </div>
+                <div class="phase-timer">
+                    <span>残り時間：</span>
+                    <span class="timer-display" id="timerDisplay">3:00</span>
+                </div>
+            </div>
+
+            <!-- フェーズインジケーター -->
+            <div class="phase-indicator" id="phaseIndicator">
+                <div class="phase-dot active"></div>
+                <div class="phase-dot"></div>
+                <div class="phase-dot"></div>
+            </div>
+
+            <!-- メインコンテンツ -->
+            <div class="firstdate-content">
+                <!-- 質問カード -->
+                <div class="firstdate-question-card">
+                    <div class="firstdate-question" id="firstDateQuestion">
+                        なんで今日、ここに来ようと思いましたか？
+                    </div>
+                    
+                    <div class="emotion-hints">
+                        <div class="emotion-hint">💭 素直な気持ちで</div>
+                        <div class="emotion-hint">💝 相手の目を見て</div>
+                        <div class="emotion-hint">🌟 ゆっくり話して</div>
+                    </div>
+
+                    <!-- 感情の天気予報 -->
+                    <div class="weather-selector" id="weatherSelector">
+                        <button class="weather-btn" onclick="selectWeather('sunny')">
+                            ☀️ <span>晴れ</span>
+                        </button>
+                        <button class="weather-btn" onclick="selectWeather('cloudy')">
+                            ☁️ <span>曇り</span>
+                        </button>
+                        <button class="weather-btn" onclick="selectWeather('rainbow')">
+                            🌈 <span>虹</span>
+                        </button>
+                        <button class="weather-btn" onclick="selectWeather('storm')">
+                            ⛈️ <span>嵐</span>
+                        </button>
+                    </div>
+                    <div class="weather-label">今の気持ちを天気で表すと？</div>
+                </div>
+
+                <!-- オノマトペリアクションボタン -->
+                <div class="onomatopoeia-container" id="onomatopoeiaContainer">
+                    <!-- JSで動的生成 -->
+                </div>
+
+                <!-- ナビゲーション -->
+                <div class="navigation-buttons">
+                    <button class="nav-btn home" onclick="backToStart()">
+                        🏠 終了
+                    </button>
+                    <button class="nav-btn next" onclick="nextFirstDatePhase()" id="firstDateNextBtn">
+                        次のフェーズへ →
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/firstdate.js"></script>
+    <script>
+        // Global State
+        let currentMode = 'normal';
+        let currentLevel = 1;
+        let currentQuestionIndex = 0;
+        let shadowModeUnlocked = true; // 常にアンロック
+        let chaosModeUnlocked = true; // 常にアンロック
+        let shadowModeCompleted = false;
+        let gameState = {
+            reactions: 0,
+            trustLevel: 0,
+            completedLevels: new Set()
+        };
+
+        // Enhanced Touch Effect System
+        class HeartConnectTouchEffects {
+            constructor() {
+                this.canvas = document.getElementById('touchEffectCanvas');
+                if (!this.canvas) {
+                    console.warn('Touch effect canvas not found');
+                    return;
+                }
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.touchPoints = [];
+                this.animationId = null;
+                this.activeTouches = new Map();
+                this.lastTouchPositions = new Map();
+                this.knownTouchIds = new Set();
+                
+                // Heart images
+                this.heartImages = [];
+                this.imageLoaded = false;
+                this.loadHeartImages();
+                
+                this.init();
+                this.bindEvents();
+                this.animate();
+            }
+            
+            loadHeartImages() {
+                const img1 = new Image();
+                img1.onload = () => {
+                    this.heartImages[0] = img1;
+                    this.checkImageLoad();
+                };
+                img1.src = 'image/1.png';
+                
+                const img2 = new Image();
+                img2.onload = () => {
+                    this.heartImages[1] = img2;
+                    this.checkImageLoad();
+                };
+                img2.src = 'image/2.png';
+            }
+            
+            checkImageLoad() {
+                if (this.heartImages.length === 2) {
+                    this.imageLoaded = true;
+                    console.log('✅ HeartConnect画像読み込み完了');
+                }
+            }
+            
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            bindEvents() {
+                // マルチタッチ完全対応
+                document.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
+                document.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: true });
+                document.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+                document.addEventListener('touchcancel', (e) => this.handleTouchEnd(e), { passive: true });
+                
+                document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+            }
+            
+            handleTouchStart(e) {
+                Array.from(e.touches).forEach(touch => {
+                    if (!this.knownTouchIds.has(touch.identifier)) {
+                        this.knownTouchIds.add(touch.identifier);
+                        
+                        const touchData = {
+                            x: touch.clientX,
+                            y: touch.clientY,
+                            startTime: Date.now(),
+                            lastTime: Date.now()
+                        };
+                        
+                        this.activeTouches.set(touch.identifier, touchData);
+                        this.lastTouchPositions.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+                        
+                        this.createHeartBurst(touch.clientX, touch.clientY);
+                        this.addTouchPoint(touch.clientX, touch.clientY);
+                        
+                        // バイブレーション
+                        if (navigator.vibrate) {
+                            navigator.vibrate(25);
+                        }
+                    }
+                });
+            }
+            
+            handleTouchMove(e) {
+                Array.from(e.touches).forEach(touch => {
+                    if (!this.knownTouchIds.has(touch.identifier)) {
+                        this.knownTouchIds.add(touch.identifier);
+                        
+                        const touchData = {
+                            x: touch.clientX,
+                            y: touch.clientY,
+                            startTime: Date.now(),
+                            lastTime: Date.now()
+                        };
+                        
+                        this.activeTouches.set(touch.identifier, touchData);
+                        this.lastTouchPositions.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+                        
+                        this.createHeartBurst(touch.clientX, touch.clientY);
+                    }
+                    
+                    if (this.activeTouches.has(touch.identifier)) {
+                        const lastPos = this.lastTouchPositions.get(touch.identifier);
+                        const currentPos = { x: touch.clientX, y: touch.clientY };
+                        
+                        const distance = Math.sqrt(
+                            Math.pow(currentPos.x - lastPos.x, 2) + 
+                            Math.pow(currentPos.y - lastPos.y, 2)
+                        );
+                        
+                        if (distance > 15) {
+                            this.createHeartTrail(currentPos.x, currentPos.y);
+                        }
+                        
+                        this.addTouchPoint(currentPos.x, currentPos.y);
+                        this.lastTouchPositions.set(touch.identifier, currentPos);
+                        
+                        const touchData = this.activeTouches.get(touch.identifier);
+                        touchData.x = currentPos.x;
+                        touchData.y = currentPos.y;
+                        touchData.lastTime = Date.now();
+                    }
+                });
+            }
+            
+            handleTouchEnd(e) {
+                Array.from(e.changedTouches).forEach(touch => {
+                    if (this.activeTouches.has(touch.identifier)) {
+                        this.createHeartFinale(touch.clientX, touch.clientY);
+                        this.activeTouches.delete(touch.identifier);
+                        this.lastTouchPositions.delete(touch.identifier);
+                        this.knownTouchIds.delete(touch.identifier);
+                    }
+                });
+                
+                if (this.activeTouches.size === 0) {
+                    setTimeout(() => {
+                        this.touchPoints = [];
+                    }, 200);
+                }
+            }
+            
+            handleMouseDown(e) {
+                if (!this.activeTouches.has('mouse')) {
+                    this.activeTouches.set('mouse', {
+                        x: e.clientX,
+                        y: e.clientY,
+                        startTime: Date.now(),
+                        lastTime: Date.now()
+                    });
+                    this.lastTouchPositions.set('mouse', { x: e.clientX, y: e.clientY });
+                    this.createHeartBurst(e.clientX, e.clientY);
+                    this.addTouchPoint(e.clientX, e.clientY);
+                }
+            }
+            
+            handleMouseMove(e) {
+                if (this.activeTouches.has('mouse')) {
+                    const lastPos = this.lastTouchPositions.get('mouse');
+                    const currentPos = { x: e.clientX, y: e.clientY };
+                    
+                    const distance = Math.sqrt(
+                        Math.pow(currentPos.x - lastPos.x, 2) + 
+                        Math.pow(currentPos.y - lastPos.y, 2)
+                    );
+                    
+                    if (distance > 12) {
+                        this.createHeartTrail(currentPos.x, currentPos.y);
+                    }
+                    
+                    this.addTouchPoint(currentPos.x, currentPos.y);
+                    this.lastTouchPositions.set('mouse', currentPos);
+                }
+            }
+            
+            handleMouseUp(e) {
+                if (this.activeTouches.has('mouse')) {
+                    this.createHeartFinale(e.clientX, e.clientY);
+                    this.activeTouches.delete('mouse');
+                    this.lastTouchPositions.delete('mouse');
+                    setTimeout(() => {
+                        this.touchPoints = [];
+                    }, 200);
+                }
+            }
+            
+            addTouchPoint(x, y) {
+                this.touchPoints.push({
+                    x: x,
+                    y: y,
+                    time: Date.now()
+                });
+                
+                this.touchPoints = this.touchPoints.filter(point => 
+                    Date.now() - point.time < 300
+                );
+            }
+            
+            createHeartBurst(x, y) {
+                const particleCount = currentMode === 'chaos' ? 10 : 6;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const speed = Math.random() * 3 + 2;
+                    const useImage = this.imageLoaded && Math.random() < 0.6;
+                    
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: Math.random() * 3 + 2,
+                        life: 1,
+                        decay: 0.02,
+                        color: this.getHeartColor(),
+                        type: useImage ? 'image' : 'heart',
+                        rotation: 0,
+                        rotationSpeed: (Math.random() - 0.5) * 0.3,
+                        imageIndex: currentLevel <= 5 ? 0 : 1
+                    });
+                }
+            }
+            
+            createHeartTrail(x, y) {
+                for (let i = 0; i < 2; i++) {
+                    const offsetX = (Math.random() - 0.5) * 20;
+                    const offsetY = (Math.random() - 0.5) * 20;
+                    const useImage = this.imageLoaded && Math.random() < 0.4;
+                    
+                    this.particles.push({
+                        x: x + offsetX,
+                        y: y + offsetY,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: -(Math.random() * 1.5 + 0.5),
+                        size: Math.random() * 2 + 1,
+                        life: 1,
+                        decay: 0.03,
+                        color: this.getHeartColor(),
+                        type: useImage ? 'image' : 'trail',
+                        rotation: 0,
+                        rotationSpeed: (Math.random() - 0.5) * 0.2,
+                        imageIndex: currentLevel <= 5 ? 0 : 1
+                    });
+                }
+            }
+            
+            createHeartFinale(x, y) {
+                const particleCount = currentMode === 'chaos' ? 12 : 8;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const speed = Math.random() * 4 + 2.5;
+                    const useImage = this.imageLoaded && Math.random() < 0.7;
+                    
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: Math.random() * 4 + 2,
+                        life: 1,
+                        decay: 0.015,
+                        color: this.getHeartColor(),
+                        type: useImage ? 'image' : 'finale',
+                        rotation: 0,
+                        rotationSpeed: (Math.random() - 0.5) * 0.4,
+                        imageIndex: currentLevel <= 5 ? 0 : 1,
+                        glow: true
+                    });
+                }
+            }
+            
+            getHeartColor() {
+                if (currentMode === 'chaos') {
+                    const chaosColors = [
+                        'rgba(138, 43, 226, 0.8)',
+                        'rgba(255, 20, 147, 0.8)',
+                        'rgba(255, 69, 0, 0.8)',
+                        'rgba(50, 205, 50, 0.8)',
+                        'rgba(255, 215, 0, 0.8)'
+                    ];
+                    return chaosColors[Math.floor(Math.random() * chaosColors.length)];
+                } else {
+                    const level = currentLevel || 1;
+                    const levelColors = [
+                        'rgba(255, 182, 193, 0.8)', // Light Pink
+                        'rgba(255, 105, 180, 0.8)', // Hot Pink  
+                        'rgba(255, 20, 147, 0.8)',  // Deep Pink
+                        'rgba(199, 21, 133, 0.8)',  // Medium Violet Red
+                        'rgba(139, 0, 0, 0.8)'      // Dark Red
+                    ];
+                    const colorIndex = Math.min(Math.floor((level - 1) / 2), levelColors.length - 1);
+                    return levelColors[colorIndex];
+                }
+            }
+            
+            updateParticles() {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const particle = this.particles[i];
+                    
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.life -= particle.decay;
+                    particle.rotation += particle.rotationSpeed;
+                    
+                    particle.vy += 0.02; // gravity
+                    particle.vx *= 0.998;
+                    particle.vy *= 0.998;
+                    
+                    if (particle.life <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+            
+            drawParticles() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach(particle => {
+                    this.ctx.save();
+                    
+                    this.ctx.globalAlpha = particle.life * 0.9;
+                    this.ctx.translate(particle.x, particle.y);
+                    this.ctx.rotate(particle.rotation);
+                    
+                    if (particle.type === 'image' && this.imageLoaded && this.heartImages[particle.imageIndex]) {
+                        // Heart image drawing
+                        const img = this.heartImages[particle.imageIndex];
+                        const size = particle.size * 8;
+                        
+                        if (currentMode === 'chaos') {
+                            this.ctx.shadowColor = particle.color;
+                            this.ctx.shadowBlur = 8;
+                            this.ctx.filter = `hue-rotate(${Math.random() * 360}deg) saturate(1.5)`;
+                        } else {
+                            this.ctx.shadowColor = particle.color;
+                            this.ctx.shadowBlur = 4;
+                        }
+                        
+                        this.ctx.drawImage(img, -size/2, -size/2, size, size);
+                    } else {
+                        // Heart shape drawing
+                        this.ctx.fillStyle = particle.color;
+                        this.ctx.shadowColor = particle.color;
+                        this.ctx.shadowBlur = particle.glow ? 8 : 4;
+                        
+                        this.drawHeart(0, 0, particle.size);
+                    }
+                    
+                    this.ctx.restore();
+                });
+            }
+            
+            drawHeart(x, y, size) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y + size/4);
+                this.ctx.bezierCurveTo(x, y, x - size/2, y, x - size/2, y + size/4);
+                this.ctx.bezierCurveTo(x - size/2, y + size/2, x, y + size, x, y + size);
+                this.ctx.bezierCurveTo(x, y + size, x + size/2, y + size/2, x + size/2, y + size/4);
+                this.ctx.bezierCurveTo(x + size/2, y, x, y, x, y + size/4);
+                this.ctx.fill();
+            }
+            
+            animate() {
+                this.updateParticles();
+                this.drawParticles();
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+            
+            destroy() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+
+        // Initialize App
+        function init() {
+            // Initialize new touch effect system
+            window.touchEffects = new HeartConnectTouchEffects();
+            
+            createParticleSystem();
+            updateDisplay();
+            
+            // Enhanced touch feedback with precise event handling
+            if ('vibrate' in navigator) {
+                document.addEventListener('touchstart', (e) => {
+                    navigator.vibrate(10);
+                }, { passive: true });
+            }
+        }
+
+        // Direct Mode Start (1タップアクセス)
+        function startDirectMode(mode) {
+            currentMode = mode;
+            
+            // 初デートモードの場合はルール画面から
+            if (mode === 'firstdate') {
+                showScreen('firstDateRulesScreen');
+                return;
+            }
+            
+            showScreen('levelScreen');
+            generateLevelGrid();
+            
+            // CHAOSモード選択時にエフェクト
+            if (mode === 'chaos') {
+                triggerChaosUnlockEffect();
+            }
+        }
+
+        // Legacy Mode Selection (互換性のため保持)
+        function selectMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.mode-btn').classList.add('active');
+            document.querySelector('.start-btn').disabled = false;
+        }
+
+        // Shadow and CHAOS modes are now always available
+
+        function triggerChaosUnlockEffect() {
+            // Create intense screen flash effect
+            const flash = document.createElement('div');
+            flash.className = 'chaos-unlock-flash';
+            flash.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: radial-gradient(circle, 
+                    rgba(138, 43, 226, 0.9) 0%, 
+                    rgba(255, 20, 147, 0.8) 30%,
+                    rgba(255, 69, 0, 0.7) 60%,
+                    transparent 100%);
+                z-index: 20000;
+                animation: chaosFlash 1.5s ease-out forwards;
+                pointer-events: none;
+            `;
+            
+            document.body.appendChild(flash);
+            
+            // Enhanced haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+            
+            setTimeout(() => {
+                if (flash.parentNode) {
+                    flash.parentNode.removeChild(flash);
+                }
+            }, 1500);
+        }
+
+        // Navigation
+        function startApp() {
+            if (currentMode) {
+                showScreen('levelScreen');
+                generateLevelGrid();
+            }
+        }
+
+        function backToStart() {
+            showScreen('startScreen');
+            resetGame();
+        }
+
+        function backToLevelSelect() {
+            showScreen('levelScreen');
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Level Selection
+        function generateLevelGrid() {
+            const grid = document.getElementById('levelGrid');
+            const modeIndicator = document.getElementById('modeIndicator');
+            
+            const modeNames = {
+                'normal': 'ノーマルモード',
+                'unique': 'ユニークモード',
+                'shadow': 'SHADOW MODE',
+                'chaos': 'CHAOS MODE'
+            };
+            
+            modeIndicator.textContent = modeNames[currentMode];
+            modeIndicator.className = `mode-indicator ${currentMode}`;
+            
+            grid.innerHTML = '';
+            
+            for (let level = 1; level <= 9; level++) {
+                const levelBtn = document.createElement('button');
+                levelBtn.className = `level-btn ${currentMode}`;
+                levelBtn.onclick = () => selectLevel(level);
+                
+                levelBtn.innerHTML = `
+                    <div class="level-number">LEVEL ${level}</div>
+                    <div class="level-description">${getLevelDescription(level)}</div>
+                    <div class="level-questions">${getQuestionCount(level)} questions</div>
+                `;
+                
+                grid.appendChild(levelBtn);
+            }
+        }
+
+        function getLevelDescription(level) {
+            const descriptions = {
+                1: '軽い話題', 2: '日常の話', 3: '感情について',
+                4: '関係性', 5: '秘密と本音', 6: '親密さ',
+                7: '禁断の話題', 8: '刺激的な体験', 9: '究極の質問'
+            };
+            return descriptions[level] || '';
+        }
+
+        function getQuestionCount(level) {
+            return QUESTIONS[currentMode] && QUESTIONS[currentMode][level] ? 
+                   QUESTIONS[currentMode][level].length : 0;
+        }
+
+        function selectLevel(level) {
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            showScreen('gameScreen');
+            updateGameDisplay();
+        }
+
+        // Game Logic
+        function updateGameDisplay() {
+            const questions = QUESTIONS[currentMode][currentLevel];
+            if (!questions || questions.length === 0) return;
+            
+            const questionText = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = questionText;
+            document.getElementById('currentLevel').textContent = `Level ${currentLevel}`;
+            document.getElementById('questionNumber').textContent = 
+                `${currentQuestionIndex + 1}/${questions.length}`;
+            
+            updateProgressBar();
+            updateAnswerExamples();
+            updateNavigationButtons();
+            generateGameReactionButtons(); // オノマトペボタンを生成
+            
+            // Add click event listener to question card for manual burst effect
+            const questionCard = document.getElementById('questionCard');
+            if (questionCard) {
+                questionCard.onclick = function(e) {
+                    // クリック可能要素でもグローバルエフェクトを使用
+                    const rect = questionCard.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    createGlobalHeartBurst(centerX, centerY);
+                };
+            }
+        }
+
+        function updateProgressBar() {
+            const questions = QUESTIONS[currentMode][currentLevel];
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateAnswerExamples() {
+            const container = document.getElementById('answerExamples');
+            container.innerHTML = '<h4>💡 回答例</h4>';
+            
+            // 簡単な回答例を表示
+            const examples = [
+                '正直に答える',
+                '体験談を話す',
+                '感情を伝える',
+                '質問で返す'
+            ];
+            
+            examples.forEach(example => {
+                const div = document.createElement('div');
+                div.className = 'example-item';
+                div.textContent = example;
+                div.onclick = () => selectExample(div);
+                container.appendChild(div);
+            });
+        }
+
+        function updateNavigationButtons() {
+            const questions = QUESTIONS[currentMode][currentLevel];
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextBtn').textContent = 
+                currentQuestionIndex === questions.length - 1 ? 'レベル完了' : '次の質問 →';
+        }
+
+        // Question Navigation
+        function nextQuestion() {
+            const questions = QUESTIONS[currentMode][currentLevel];
+            
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                updateGameDisplay();
+            } else {
+                // Level completed
+                gameState.completedLevels.add(currentLevel);
+                showLevelCompletion();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                updateGameDisplay();
+            }
+        }
+
+        // ゲーム用オノマトペボタン生成
+        function generateGameReactionButtons() {
+            const container = document.getElementById('gameReactionButtons');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // シンプルなオノマトペセット（6個）
+            const gameReactions = [
+                { text: "きゅん💗", type: "positive" },
+                { text: "わかる〜💭", type: "neutral" },
+                { text: "すてき✨", type: "positive" },
+                { text: "へぇ〜😮", type: "curious" },
+                { text: "なるほど😊", type: "neutral" },
+                { text: "おもしろい🤔", type: "curious" }
+            ];
+            
+            // 3列2行のグリッド
+            container.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                margin: 20px 0;
+            `;
+            
+            gameReactions.forEach(reaction => {
+                const btn = document.createElement('button');
+                btn.className = 'reaction-btn';
+                btn.textContent = reaction.text;
+                btn.onclick = () => gameReaction(reaction.text, reaction.type);
+                btn.style.cssText = `
+                    background: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                    padding: 8px 12px;
+                    font-size: 14px;
+                    color: rgba(255, 255, 255, 0.9);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                `;
+                container.appendChild(btn);
+            });
+        }
+        
+        // ゲーム用リアクション処理
+        function gameReaction(text, type) {
+            gameState.reactions++;
+            gameState.trustLevel += 5;
+            
+            // ビッグオノマトペ表示
+            showBigOnomatopoeia(text);
+            
+            // ハートエフェクト
+            createGameHearts(type);
+            
+            // ボタンアニメーション
+            event.target.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                event.target.style.transform = 'scale(1)';
+            }, 150);
+            
+            // バイブレーション
+            if (navigator.vibrate) {
+                navigator.vibrate([20, 10, 20]);
+            }
+        }
+        
+        // ゲーム用ハートエフェクト
+        function createGameHearts(type) {
+            const colors = {
+                positive: ['#FF69B4', '#FF1493', '#FFB6C1'],
+                neutral: ['#87CEEB', '#4682B4', '#ADD8E6'],
+                curious: ['#9370DB', '#8A2BE2', '#BA55D3']
+            };
+            
+            const selectedColors = colors[type] || colors.positive;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            for (let i = 0; i < 5; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '💝';
+                heart.style.cssText = `
+                    position: fixed;
+                    left: ${centerX}px;
+                    top: ${centerY}px;
+                    font-size: 20px;
+                    color: ${selectedColors[Math.floor(Math.random() * selectedColors.length)]};
+                    pointer-events: none;
+                    z-index: 10000;
+                    animation: heartFloat 1.5s ease-out forwards;
+                    --tx: ${(Math.random() - 0.5) * 150}px;
+                    --ty: ${(Math.random() - 0.5) * 150 - 50}px;
+                `;
+                
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 1500);
+            }
+        }
+        
+        // ビッグオノマトペ表示
+        function showBigOnomatopoeia(text) {
+            const bigText = document.createElement('div');
+            bigText.className = 'big-onomatopoeia';
+            bigText.textContent = text.replace(/[😊💗💓✨🤔💭😮🧐😳😲😱😅🤨💕😳💡😌]/g, '');
+            bigText.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 60px;
+                font-weight: bold;
+                color: rgba(255, 105, 180, 0.8);
+                text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+                pointer-events: none;
+                animation: bigOnomatopoeia 1s ease-out forwards;
+                z-index: 1000;
+            `;
+            document.body.appendChild(bigText);
+            
+            setTimeout(() => {
+                if (bigText.parentNode) {
+                    bigText.parentNode.removeChild(bigText);
+                }
+            }, 1000);
+        }
+
+        // Reactions (旧バージョン - 互換性のため残す)
+        function react(type) {
+            gameState.reactions++;
+            gameState.trustLevel += 5;
+            
+            createReactionEffect(type);
+            
+            const messages = {
+                empathy: '共感してくれてありがとう！💕',
+                curious: 'もっと詳しく聞かせてね！🤔',
+                more: '続きが気になる！💭',
+                question: '質問があるんだね！❓'
+            };
+            
+            showMessage(messages[type]);
+        }
+
+        function createReactionEffect(type) {
+            const btn = event.target;
+            btn.classList.add('reacting');
+            setTimeout(() => btn.classList.remove('reacting'), 300);
+        }
+
+        // Simplified global burst for backward compatibility
+        function createGlobalHeartBurst(x, y) {
+            if (window.touchEffects) {
+                window.touchEffects.createHeartBurst(x, y);
+            }
+        }
+
+        // Legacy heart burst for clickable elements
+        function createHeartBurst(event) {
+            if (window.touchEffects) {
+                let x, y;
+                if (event.touches && event.touches.length > 0) {
+                    x = event.touches[0].clientX;
+                    y = event.touches[0].clientY;
+                } else {
+                    x = event.clientX || event.pageX;
+                    y = event.clientY || event.pageY;
+                }
+                window.touchEffects.createHeartBurst(x, y);
+            }
+        }
+
+        // CHAOS Mode Upward Flow Effect - now simplified
+        function createChaosUpwardFlow(centerX, centerY) {
+            // This is now handled by the HeartConnectTouchEffects class
+            if (window.touchEffects && currentMode === 'chaos') {
+                window.touchEffects.createHeartFinale(centerX, centerY);
+            }
+        }
+
+        // Particle System
+        function createParticleSystem() {
+            const container = document.getElementById('particleSystem');
+            
+            setInterval(() => {
+                if (Math.random() < 0.3) {
+                    const particle = document.createElement('div');
+                    particle.className = 'floating-particle';
+                    
+                    // Different particles for different levels
+                    if (currentLevel <= 2) {
+                        particle.innerHTML = '⭐';
+                    } else {
+                        particle.innerHTML = '💝';
+                    }
+                    
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+                    
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 5000);
+                }
+            }, 2000);
+        }
+
+        // Utility Functions
+        function selectExample(element) {
+            element.classList.add('selected');
+            setTimeout(() => element.classList.remove('selected'), 1000);
+        }
+
+        function showMessage(text) {
+            const message = document.createElement('div');
+            message.className = 'message-popup';
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 2500);
+        }
+
+        function showLevelCompletion() {
+            document.getElementById('completionStats').innerHTML = `
+                <div class="stat">レベル ${currentLevel} 完了！</div>
+                <div class="stat">リアクション数: ${gameState.reactions}</div>
+                <div class="stat">信頼度: ${gameState.trustLevel}%</div>
+            `;
+            showScreen('completionScreen');
+        }
+
+        function continueToNextLevel() {
+            if (currentLevel < 9) {
+                currentLevel++;
+                currentQuestionIndex = 0;
+                showScreen('gameScreen');
+                updateGameDisplay();
+            } else {
+                showFinalCompletion();
+            }
+        }
+
+        function restartLevel() {
+            currentQuestionIndex = 0;
+            showScreen('gameScreen');
+            updateGameDisplay();
+        }
+
+        function resetGame() {
+            currentLevel = 1;
+            currentQuestionIndex = 0;
+            gameState = {
+                reactions: 0,
+                trustLevel: 0,
+                completedLevels: new Set()
+            };
+        }
+
+        function updateDisplay() {
+            // Update level colors and effects based on current level
+            document.body.className = `level-${currentLevel} mode-${currentMode}`;
+        }
+
+        function showFinalCompletion() {
+            showMessage('🎊 全レベル完了！おめでとうございます！ 🎊');
+            setTimeout(() => backToStart(), 3000);
+        }
+
+        // These functions are now handled by HeartConnectTouchEffects class
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
