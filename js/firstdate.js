@@ -3,12 +3,24 @@
 // HeartConnect - First Date Mode
 // ===============================================
 
+// 拡張質問データベースを読み込み
+const script = document.createElement('script');
+script.src = 'js/firstdate-questions.js';
+document.head.appendChild(script);
+
 class FirstDateModerator {
     constructor() {
+        this.currentLevel = 1; // 初デートレベル（1-3）
         this.currentPhase = 1;
         this.timer = null;
         this.timeRemaining = 180; // 3分
         this.selectedReactions = [];
+        this.moderatorStyle = 'friendly'; // デフォルトは友好的な司会者
+        this.questionsPerPhase = 6; // 各フェーズの質問数
+        this.currentQuestionSet = []; // 現在のフェーズの質問セット
+        this.usedQuestions = new Set(); // 使用済み質問を追跡
+        
+        // 旧質問データ（後方互換性のため一時的に保持）
         this.phaseQuestions = {
             1: [
                 {
@@ -133,19 +145,217 @@ class FirstDateModerator {
     
     init() {
         this.generateOnomatopoeiaButtons();
+        this.setupModeSelector(); // 司会者スタイル選択を追加
+        this.setupLevelSelector(); // レベル選択を追加
         this.startPhase(1);
         this.bindGlobalTouchEffects();
+    }
+    
+    // レベル選択UIをセットアップ
+    setupLevelSelector() {
+        const moderatorPanel = document.getElementById('moderatorPanel');
+        if (!moderatorPanel) return;
+        
+        // レベル選択ボタンを追加
+        const levelSelector = document.createElement('div');
+        levelSelector.className = 'level-selector';
+        levelSelector.innerHTML = `
+            <span class="level-label">デートレベル:</span>
+            <button class="level-btn active" data-level="1">💓 初対面</button>
+            <button class="level-btn" data-level="2">💕 初デート</button>
+            <button class="level-btn" data-level="3">💖 真剣デート</button>
+        `;
+        
+        // 司会者スタイル選択の後に挿入
+        const styleSelector = moderatorPanel.querySelector('.moderator-style-selector');
+        if (styleSelector) {
+            styleSelector.after(levelSelector);
+        } else {
+            moderatorPanel.insertBefore(levelSelector, moderatorPanel.firstChild);
+        }
+        
+        // ボタンクリックイベント
+        levelSelector.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // アクティブクラスの切り替え
+                levelSelector.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // レベルを変更
+                this.currentLevel = parseInt(e.target.dataset.level);
+                this.restartWithNewLevel();
+            });
+        });
+    }
+    
+    // 新しいレベルでゲームを再開
+    restartWithNewLevel() {
+        this.currentPhase = 1;
+        this.currentQuestionIndex = 0;
+        this.usedQuestions.clear();
+        this.selectedReactions = [];
+        this.reactionCounts = {};
+        this.weatherHistory = [];
+        
+        this.startPhase(1);
+        this.updateLevelDescription();
+    }
+    
+    // レベル説明を更新
+    updateLevelDescription() {
+        if (typeof FIRSTDATE_LEVELS === 'undefined') return;
+        
+        const level = FIRSTDATE_LEVELS[this.currentLevel];
+        if (!level) return;
+        
+        const message = `${level.icon} ${level.name}: ${level.description}`;
+        this.showModeratorMessage(message);
+    }
+    
+    // 司会者スタイル選択UIをセットアップ
+    setupModeSelector() {
+        const moderatorPanel = document.getElementById('moderatorPanel');
+        if (!moderatorPanel) return;
+        
+        // 司会者スタイル選択ボタンを追加
+        const styleSelector = document.createElement('div');
+        styleSelector.className = 'moderator-style-selector';
+        styleSelector.innerHTML = `
+            <span class="style-label">司会者スタイル:</span>
+            <button class="style-btn active" data-style="friendly">😊 フレンドリー</button>
+            <button class="style-btn" data-style="romantic">💕 ロマンティック</button>
+            <button class="style-btn" data-style="humorous">😄 ユーモア</button>
+        `;
+        
+        // 既存の要素の前に挿入
+        moderatorPanel.insertBefore(styleSelector, moderatorPanel.firstChild);
+        
+        // ボタンクリックイベント
+        styleSelector.querySelectorAll('.style-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // アクティブクラスの切り替え
+                styleSelector.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // スタイルを変更
+                this.moderatorStyle = e.target.dataset.style;
+                this.updateModeratorGreeting();
+            });
+        });
+    }
+    
+    // レベルとフェーズに応じた質問を取得
+    getQuestionsForPhase(phase) {
+        let questions = [];
+        
+        // レベル1（初対面）の場合は専用の質問を使用
+        if (this.currentLevel === 1) {
+            if (typeof FIRSTDATE_LEVEL1_QUESTIONS !== 'undefined') {
+                const phaseKey = `phase${phase}`;
+                questions = FIRSTDATE_LEVEL1_QUESTIONS[phaseKey] || [];
+            } else {
+                // フォールバック：既存の質問を使用
+                questions = this.phaseQuestions[phase] || [];
+            }
+        } else {
+            // レベル2以降は拡張質問データベースを使用
+            if (typeof FIRSTDATE_EXTENDED_QUESTIONS === 'undefined') {
+                // フォールバック：既存の質問を使用
+                return this.phaseQuestions[phase] || [];
+            }
+            
+            // フェーズに応じて適切な質問カテゴリーから選択
+            switch(phase) {
+                case 1: // アイスブレイク
+                    questions = [
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase1.icebreaker,
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase1.firstImpression
+                    ];
+                    break;
+                case 2: // 趣味・ライフスタイル
+                    questions = [
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase2.hobbies,
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase2.lifestyle
+                    ];
+                    break;
+                case 3: // 価値観・恋愛観
+                    questions = [
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase3.values,
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase3.romance
+                    ];
+                    break;
+                case 4: // 楽しい想像・ゲーム
+                    questions = [
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase4.imagination,
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase4.games
+                    ];
+                    break;
+                case 5: // 未来の話・締めくくり
+                    questions = [
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase5.future,
+                        ...FIRSTDATE_EXTENDED_QUESTIONS.phase5.closing
+                    ];
+                    break;
+                default:
+                    // フォールバック
+                    questions = this.phaseQuestions[phase] || [];
+            }
+        }
+        
+        // レベル1は全ての質問を順番に使用（ランダムではない）
+        if (this.currentLevel === 1) {
+            return questions;
+        }
+        
+        // レベル2以降は使用済みでない質問をフィルターしてランダム選択
+        const availableQuestions = questions.filter(q => !this.usedQuestions.has(q.question));
+        
+        // ランダムに選択
+        const selectedQuestions = [];
+        const needed = Math.min(this.questionsPerPhase, availableQuestions.length);
+        
+        for (let i = 0; i < needed; i++) {
+            const index = Math.floor(Math.random() * availableQuestions.length);
+            const question = availableQuestions.splice(index, 1)[0];
+            selectedQuestions.push(question);
+            this.usedQuestions.add(question.question);
+        }
+        
+        return selectedQuestions;
+    }
+    
+    // 司会者のメッセージをスタイルに応じて更新
+    updateModeratorGreeting() {
+        if (typeof MODERATOR_STYLES === 'undefined') return;
+        
+        const style = MODERATOR_STYLES[this.moderatorStyle];
+        if (!style) return;
+        
+        const greeting = style.greetings[Math.floor(Math.random() * style.greetings.length)];
+        this.showModeratorMessage(greeting);
     }
     
     startPhase(phase) {
         this.currentPhase = phase;
         this.currentQuestionIndex = 0;
+        
+        // 新しい質問セットを取得
+        this.currentQuestionSet = this.getQuestionsForPhase(phase);
+        
+        // 質問がない場合は次のフェーズへ（5フェーズ以上ある場合）
+        if (this.currentQuestionSet.length === 0 && phase < 5) {
+            this.startPhase(phase + 1);
+            return;
+        }
+        
         this.updatePhaseIndicator();
         this.showNextQuestion();
         this.startTimer();
         
         // 司会者のアナウンス
-        const intro = this.phaseQuestions[phase][0].moderatorIntro;
+        const intro = this.currentQuestionSet[0]?.moderatorIntro || 
+                     this.phaseQuestions[phase]?.[0]?.moderatorIntro ||
+                     "新しいフェーズを始めましょう！";
         this.showModeratorMessage(intro);
         
         // フェーズ開始エフェクト
@@ -153,7 +363,10 @@ class FirstDateModerator {
     }
     
     showNextQuestion() {
-        const questions = this.phaseQuestions[this.currentPhase];
+        const questions = this.currentQuestionSet.length > 0 ? 
+                         this.currentQuestionSet : 
+                         this.phaseQuestions[this.currentPhase];
+                         
         if (this.currentQuestionIndex < questions.length) {
             const currentQ = questions[this.currentQuestionIndex];
             
@@ -233,15 +446,25 @@ class FirstDateModerator {
     }
     
     updatePhaseIndicator() {
-        const dots = document.querySelectorAll('.phase-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.remove('active', 'completed');
-            if (index < this.currentPhase - 1) {
+        const phaseIndicator = document.getElementById('phaseIndicator');
+        if (!phaseIndicator) return;
+        
+        const maxPhases = this.getMaxPhasesForLevel();
+        
+        // フェーズドットを動的に生成
+        phaseIndicator.innerHTML = '';
+        for (let i = 1; i <= maxPhases; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'phase-dot';
+            
+            if (i < this.currentPhase) {
                 dot.classList.add('completed');
-            } else if (index === this.currentPhase - 1) {
+            } else if (i === this.currentPhase) {
                 dot.classList.add('active');
             }
-        });
+            
+            phaseIndicator.appendChild(dot);
+        }
     }
     
     showModeratorMessage(message) {
@@ -408,9 +631,19 @@ class FirstDateModerator {
     endPhase() {
         this.stopTimer();
         
-        if (this.currentPhase < 3) {
+        // 司会者スタイルに応じた励ましメッセージ
+        let encouragement = `フェーズ${this.currentPhase}お疲れ様でした！`;
+        if (typeof MODERATOR_STYLES !== 'undefined' && MODERATOR_STYLES[this.moderatorStyle]) {
+            const style = MODERATOR_STYLES[this.moderatorStyle];
+            encouragement = style.encouragements[Math.floor(Math.random() * style.encouragements.length)];
+        }
+        
+        // レベルに応じた最大フェーズ数を取得
+        const maxPhases = this.getMaxPhasesForLevel();
+        
+        if (this.currentPhase < maxPhases) {
             // 次のフェーズへの確認
-            this.showModeratorMessage(`フェーズ${this.currentPhase}お疲れ様でした！次のフェーズに進みますか？`);
+            this.showModeratorMessage(encouragement + " 次のフェーズに進みますか？");
             document.getElementById('firstDateNextBtn').textContent = '次のフェーズへ →';
             document.getElementById('firstDateNextBtn').onclick = () => {
                 this.startPhase(this.currentPhase + 1);
@@ -419,6 +652,14 @@ class FirstDateModerator {
             // 全フェーズ終了
             this.showCompletionMessage();
         }
+    }
+    
+    // レベルに応じた最大フェーズ数を取得
+    getMaxPhasesForLevel() {
+        if (typeof FIRSTDATE_LEVELS !== 'undefined' && FIRSTDATE_LEVELS[this.currentLevel]) {
+            return FIRSTDATE_LEVELS[this.currentLevel].phases;
+        }
+        return 3; // デフォルト
     }
     
     showCompletionMessage() {

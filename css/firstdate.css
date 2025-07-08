@@ -19,6 +19,85 @@
     transform: translateY(-5px) scale(1.02);
 }
 
+/* 司会者スタイル選択 */
+.moderator-style-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.style-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-right: 10px;
+}
+
+.style-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.style-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.style-btn.active {
+    background: linear-gradient(135deg, #FF69B4, #FF1493);
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+}
+
+/* レベル選択 */
+.level-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.level-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-right: 10px;
+}
+
+.level-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.level-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.level-btn.active {
+    background: linear-gradient(135deg, #FF1493, #FF69B4);
+    box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+}
+
 /* 司会者パネル */
 .moderator-panel {
     position: relative;
