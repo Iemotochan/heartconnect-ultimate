@@ -358,6 +358,9 @@ class FirstDateModerator {
                      "新しいフェーズを始めましょう！";
         this.showModeratorMessage(intro);
         
+        // 次の質問ボタンの初期状態を設定
+        this.updateNextQuestionButton();
+        
         // フェーズ開始エフェクト
         this.createPhaseStartEffect();
     }
@@ -396,6 +399,9 @@ class FirstDateModerator {
             }, 10);
             
             this.currentQuestionIndex++;
+            
+            // 次の質問ボタンの状態を更新
+            this.updateNextQuestionButton();
         } else {
             // フェーズ終了
             this.endPhase();
@@ -488,12 +494,30 @@ class FirstDateModerator {
         const container = document.getElementById('onomatopoeiaContainer');
         container.innerHTML = '';
         
+        // コントロールボタンエリアを作成
+        const controlArea = document.createElement('div');
+        controlArea.className = 'control-buttons-area';
+        
         // リセットボタンを追加
         const resetBtn = document.createElement('button');
         resetBtn.className = 'reset-reactions-btn';
-        resetBtn.textContent = '🔄 リアクションをリセット';
+        resetBtn.textContent = '🔄 リアクション リセット';
         resetBtn.onclick = () => this.resetReactions();
-        container.appendChild(resetBtn);
+        controlArea.appendChild(resetBtn);
+        
+        // 次のフェーズボタンを追加
+        const nextPhaseBtn = document.createElement('button');
+        nextPhaseBtn.className = 'next-phase-btn';
+        nextPhaseBtn.id = 'nextPhaseBtn';
+        nextPhaseBtn.textContent = '▶️ 次の質問';
+        nextPhaseBtn.onclick = () => this.showNextQuestion();
+        controlArea.appendChild(nextPhaseBtn);
+        
+        container.appendChild(controlArea);
+        
+        // オノマトペボタングリッドを作成
+        const buttonsGrid = document.createElement('div');
+        buttonsGrid.className = 'onomatopoeia-buttons-grid';
         
         // オノマトペボタンを生成
         this.onomatopoeiaOptions.forEach(option => {
@@ -514,8 +538,10 @@ class FirstDateModerator {
             
             btn.dataset.type = option.type;
             btn.onclick = () => this.selectOnomatopoeia(option.text, option.type);
-            container.appendChild(btn);
+            buttonsGrid.appendChild(btn);
         });
+        
+        container.appendChild(buttonsGrid);
     }
     
     selectOnomatopoeia(text, type) {
@@ -644,10 +670,9 @@ class FirstDateModerator {
         if (this.currentPhase < maxPhases) {
             // 次のフェーズへの確認
             this.showModeratorMessage(encouragement + " 次のフェーズに進みますか？");
-            document.getElementById('firstDateNextBtn').textContent = '次のフェーズへ →';
-            document.getElementById('firstDateNextBtn').onclick = () => {
+            this.updateNextPhaseButton('次のフェーズへ →', () => {
                 this.startPhase(this.currentPhase + 1);
-            };
+            });
         } else {
             // 全フェーズ終了
             this.showCompletionMessage();
@@ -660,6 +685,41 @@ class FirstDateModerator {
             return FIRSTDATE_LEVELS[this.currentLevel].phases;
         }
         return 3; // デフォルト
+    }
+    
+    // 次のフェーズボタンを更新
+    updateNextPhaseButton(text, onClick) {
+        const nextPhaseBtn = document.getElementById('nextPhaseBtn');
+        if (nextPhaseBtn) {
+            nextPhaseBtn.textContent = text;
+            nextPhaseBtn.onclick = onClick;
+            nextPhaseBtn.style.display = 'block';
+        }
+        
+        // 従来の下部ボタンは非表示
+        const oldBtn = document.getElementById('firstDateNextBtn');
+        if (oldBtn) {
+            oldBtn.style.display = 'none';
+        }
+    }
+    
+    // 次の質問ボタンの表示を更新
+    updateNextQuestionButton() {
+        const nextPhaseBtn = document.getElementById('nextPhaseBtn');
+        if (nextPhaseBtn) {
+            const questions = this.currentQuestionSet.length > 0 ? 
+                             this.currentQuestionSet : 
+                             this.phaseQuestions[this.currentPhase];
+                             
+            if (this.currentQuestionIndex < questions.length) {
+                nextPhaseBtn.textContent = '▶️ 次の質問';
+                nextPhaseBtn.onclick = () => this.showNextQuestion();
+                nextPhaseBtn.style.display = 'block';
+            } else {
+                // フェーズ終了
+                nextPhaseBtn.style.display = 'none';
+            }
+        }
     }
     
     showCompletionMessage() {
@@ -678,10 +738,10 @@ class FirstDateModerator {
         const card = document.querySelector('.firstdate-question-card');
         card.innerHTML = summary;
         
-        document.getElementById('firstDateNextBtn').textContent = 'ホームに戻る';
-        document.getElementById('firstDateNextBtn').onclick = () => {
+        // 新しいボタンを更新
+        this.updateNextPhaseButton('🏠 ホームに戻る', () => {
             window.backToStart();
-        };
+        });
     }
     
     getMostFrequentEmotion() {

@@ -98,6 +98,44 @@
     box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
 }
 
+/* コントロールボタンスタイル */
+.reset-reactions-btn,
+.next-phase-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    color: white;
+    text-align: center;
+    min-width: 120px;
+}
+
+.reset-reactions-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.reset-reactions-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.next-phase-btn {
+    background: linear-gradient(135deg, #FF69B4, #FF1493);
+    border: 1px solid rgba(255, 105, 180, 0.5);
+}
+
+.next-phase-btn:hover {
+    background: linear-gradient(135deg, #FF1493, #FF69B4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5);
+}
+
 /* 司会者パネル */
 .moderator-panel {
     position: relative;
@@ -162,12 +200,29 @@
 
 /* オノマトペリアクションボタン */
 .onomatopoeia-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     padding: 20px 0;
     max-width: 500px;
     margin: 0 auto;
+}
+
+/* コントロールボタンエリア */
+.control-buttons-area {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* オノマトペボタングリッド */
+.onomatopoeia-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
 }
 
 .onomatopoeia-btn {
